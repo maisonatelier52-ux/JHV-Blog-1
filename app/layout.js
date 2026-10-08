@@ -1,3 +1,4 @@
+// blog first for JHV
 import { Playfair_Display, Lora } from "next/font/google";
 import { person } from "@/lib/site";
 import "./globals.css";
