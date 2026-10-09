@@ -2,8 +2,23 @@
 @tailwind components;
 @tailwind utilities;
 
-*:focus-visible { outline: 2px solid #0A0A0A; outline-offset: 3px; }
+/* Loading page only: deep navy with white pinstripe lines.
+   --stripe = distance between two lines, --stripe-color = line color. */
+:root { --stripe: 56px; --stripe-color: rgba(255, 255, 255, 0.09); }
+@media (max-width: 640px) { :root { --stripe: 36px; } }
+.pinstripe-deep {
+  background-color: #050A14;
+  background-image:
+    repeating-linear-gradient(90deg, transparent 0, transparent calc(var(--stripe) - 1px), var(--stripe-color) calc(var(--stripe) - 1px), var(--stripe-color) var(--stripe)),
+    radial-gradient(ellipse 60% 50% at 50% 45%, rgba(30, 56, 104, 0.45), transparent 75%);
+}
+
+/* The loading page content is hidden by the critical styles in app/layout.js until this stylesheet is here */
+[data-loader] > * { visibility: visible !important; }
+
+*:focus-visible { outline: 2px solid #12264A; outline-offset: 3px; }
 @keyframes reveal { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
+@keyframes portrait-in { from { opacity: 0; transform: translateY(16px) scale(1.02); } to { opacity: 1; transform: none; } }
 @keyframes enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
 @keyframes iris {
   0% { clip-path: circle(0px at var(--x) var(--y)); }
@@ -12,7 +27,10 @@
   100% { clip-path: circle(0px at var(--x2) var(--y2)); }
 }
 .reveal { animation: reveal 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+.portrait-in { animation: portrait-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .enter { animation: enter 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.iris { animation: iris 1.3s cubic-bezier(0.7, 0, 0.3, 1) both; }
-@media (prefers-reduced-motion: reduce) { .reveal, .enter { animation: none; } }
-[data-wait] { display: none; }
+.iris { animation: iris 1.3s cubic-bezier(0.7, 0, 0.3, 1) both; will-change: clip-path; }
+@media (prefers-reduced-motion: reduce) { .reveal, .enter, .portrait-in { animation: none; } }
+/* While the navy curtain is down the page is already drawn behind it (so the photo is decoded and ready),
+   but its entrance animations wait. They start the moment the curtain begins to lift. */
+[data-wait] .reveal, [data-wait] .enter, [data-wait] .portrait-in { animation-play-state: paused; }

@@ -5,18 +5,18 @@ import { person, stops } from "@/lib/site";
 import { TransitionContext } from "@/lib/transition";
 import TransitionLink from "./TransitionLink";
 import Arrow from "./Arrow";
+import LoaderSignature from "./LoaderSignature";
 
-const R = 46;
-const C = 2 * Math.PI * R;
+const LOADER_MS = 1550; // time from the start of the page load until the JHV mark has finished writing (see LoaderSignature)
+const LIFT_MS = 750; // the loading page lifts from the bottom to the top and shows the home page
 
 // Header, portrait, controls, page transition and the loader. The page text itself lives in the routes.
 export default function Shell({ children }) {
   const pathname = usePathname();
   const router = useRouter();
 
-  // The loader only exists when the site is opened on the home page. Other pages (and refreshes on them) start straight away.
+  // The loading page only exists when the site is opened on the home page. Other pages (and refreshes on them) start straight away.
   const [loading] = useState(pathname === "/");
-  const [pct, setPct] = useState(0);
   const [ready, setReady] = useState(pathname !== "/");
   const [gone, setGone] = useState(pathname !== "/");
   const [iris, setIris] = useState({ k: 0 });
@@ -40,26 +40,35 @@ export default function Shell({ children }) {
     setTimeout(() => { busy.current = false; }, 1350);
   }, [pathname, router]);
 
+  // Loading page: held until the JHV mark is written, then it lifts and the home page appears.
   useEffect(() => {
     if (!loading) return;
-    let p = 0;
-    const t = setInterval(() => {
-      p = Math.min(100, p + 1.5 + Math.random() * 4);
-      setPct(p);
-      if (p >= 100) { clearInterval(t); setTimeout(() => setReady(true), 400); setTimeout(() => setGone(true), 1700); }
-    }, 55);
-    return () => clearInterval(t);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) { setReady(true); setGone(true); return; }
+    // The loading page is on screen from the first paint, before this code runs. Counting from the start of the page load
+    // means we only wait for what is left, never a full extra delay.
+    const wait = Math.max(100, LOADER_MS - performance.now());
+    const a = setTimeout(() => setReady(true), wait);
+    const b = setTimeout(() => setGone(true), wait + LIFT_MS + 100);
+    return () => { clearTimeout(a); clearTimeout(b); };
   }, [loading]);
+
+  // The navy start-up background (see app/layout.js) is only needed until the loading page is gone.
+  useEffect(() => {
+    if (!gone) return;
+    document.documentElement.removeAttribute("data-home");
+    document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#ECEEF1");
+  }, [gone]);
 
   useEffect(() => {
     const k = (e) => {
+      if (!ready) return;
       if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
       if (["ArrowRight", "ArrowDown"].includes(e.key) && step < last) go(stops[step + 1].href);
       if (["ArrowLeft", "ArrowUp"].includes(e.key) && step > 0) go(stops[step - 1].href);
     };
     window.addEventListener("keydown", k);
     return () => window.removeEventListener("keydown", k);
-  }, [go, step, last]);
+  }, [go, step, last, ready]);
 
   return (
     <TransitionContext.Provider value={go}>
@@ -73,10 +82,10 @@ export default function Shell({ children }) {
           if (d > 0 && step > 0) go(stops[step - 1].href);
         }}
       >
-        {/* Held back (display: none) until the loader is done, so the entrance animations play when it lifts. */}
-        <div data-wait={ready ? undefined : ""} className="contents">
+        {/* Drawn behind the loading page from the start (nothing has to load later); its entrance animations wait until the loading page fades. */}
+        <div data-wait={ready ? undefined : ""} inert={!ready} className="contents">
           {/* Portrait: edge to edge on phones, big on the right and bottom on desktop. The circle sits under it. */}
-          <div className="reveal absolute right-0 top-0 z-10 h-[80dvh] w-full lg:bottom-0 lg:top-auto lg:h-dvh lg:w-[min(100dvh,64vw)]">
+          <div className="portrait-in absolute right-0 top-0 z-10 h-[80dvh] w-full lg:bottom-0 lg:top-auto lg:h-dvh lg:w-[min(100dvh,64vw)]">
             <div className="absolute -right-[10%] top-[4%] aspect-square h-[80%] rounded-full bg-shade-deep" />
             <img src={person.portrait} alt={`Portrait of ${person.name}`} className="absolute inset-0 h-full w-full object-cover object-right-bottom" />
           </div>
@@ -98,44 +107,36 @@ export default function Shell({ children }) {
           <div className="enter absolute bottom-5 left-5 z-30 flex flex-col items-start gap-4 lg:bottom-10 lg:left-16">
             <div className="flex items-center gap-3">
               {step > 0 && (
-                <TransitionLink href={stops[step - 1].href} aria-label="Previous" className="grid h-14 w-14 place-items-center rounded-full border border-line bg-white text-ink ring-4 ring-white/90 hover:bg-ink hover:text-white">
+                <TransitionLink href={stops[step - 1].href} aria-label="Previous" className="grid h-14 w-14 place-items-center rounded-full border border-line bg-white text-ink ring-4 ring-white/90 hover:bg-accent hover:text-white">
                   <span className="rotate-180"><Arrow /></span>
                 </TransitionLink>
               )}
-              <TransitionLink id="next" href={nextStop.href} className="group flex items-center gap-4 rounded-full bg-ink py-1.5 pl-6 pr-1.5 text-lg font-medium text-white ring-4 ring-white/90">
+              <TransitionLink id="next" href={nextStop.href} className="group flex items-center gap-4 rounded-full bg-accent py-1.5 pl-6 pr-1.5 text-lg font-medium text-white ring-4 ring-white/90">
                 <span className="lg:hidden">{slide.short}</span>
                 <span className="hidden lg:inline">{slide.next}</span>
-                <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-ink"><Arrow /></span>
+                <span className="grid h-11 w-11 place-items-center rounded-full bg-white text-accent"><Arrow /></span>
               </TransitionLink>
             </div>
             <div className="hidden items-center gap-2 rounded-full bg-white px-3 py-2 shadow-sm lg:flex">
               {stops.map((s, i) => (
-                <TransitionLink key={s.href} href={s.href} aria-label={`Go to ${s.nav}`} aria-current={i === step ? "page" : undefined} className={`h-2 rounded-full transition-all duration-300 ${i === step ? "w-8 bg-ink" : "w-2 bg-ink/20 hover:bg-ink/40"}`} />
+                <TransitionLink key={s.href} href={s.href} aria-label={`Go to ${s.nav}`} aria-current={i === step ? "page" : undefined} className={`h-2 rounded-full transition-all duration-300 ${i === step ? "w-8 bg-accent" : "w-2 bg-accent/20 hover:bg-accent/40"}`} />
               ))}
             </div>
           </div>
         </div>
 
-        {/* Page transition: a black iris opens from the button, then closes onto the portrait */}
+        {/* Page transition: an iris with the loading page background (deep navy + white pinstripes) opens from the button, then closes onto the portrait */}
         {iris.k > 0 && (
-          <div key={iris.k} className="iris pointer-events-none fixed inset-0 z-[45] bg-ink" style={{ "--x": `${iris.x}px`, "--y": `${iris.y}px`, "--x2": `${iris.x2}px`, "--y2": `${iris.y2}px` }} />
+          <div key={iris.k} className="iris pinstripe-deep pointer-events-none fixed inset-0 z-[45]" style={{ "--x": `${iris.x}px`, "--y": `${iris.y}px`, "--x2": `${iris.x2}px`, "--y2": `${iris.y2}px` }} />
         )}
 
-        {/* Loader: home page only. White, circular progress around the crest, then fades to the home */}
+        {/* Loading page: home page only. Deep navy with white pinstripes, the crest and the JHV mark. When it is done it lifts
+            from the bottom to the top and the home page is underneath. */}
         {loading && !gone && (
-          <div data-loader className={`pointer-events-none fixed inset-0 z-50 grid place-items-center bg-white text-ink transition-all duration-1000 ease-out motion-reduce:transition-none ${ready ? "scale-105 opacity-0" : "opacity-100"}`}>
-            <div className="text-center">
-              <div className="relative mx-auto h-52 w-52">
-                <svg viewBox="0 0 100 100" className="absolute inset-0 animate-[spin_8s_linear_infinite]">
-                  <circle cx="50" cy="50" r="49" fill="none" stroke="#0A0A0A" strokeOpacity=".3" strokeWidth=".6" strokeDasharray="1 3" />
-                </svg>
-                <svg viewBox="0 0 100 100" className="absolute inset-0 -rotate-90">
-                  <circle cx="50" cy="50" r={R} fill="none" stroke="#0A0A0A" strokeOpacity=".1" strokeWidth="1.6" />
-                  <circle cx="50" cy="50" r={R} fill="none" stroke="#0A0A0A" strokeWidth="1.6" strokeLinecap="round" strokeDasharray={C} strokeDashoffset={C * (1 - pct / 100)} />
-                </svg>
-                <div className="absolute inset-0 grid place-items-center"><img src={person.logo} alt="" className="h-28 w-auto" /></div>
-              </div>
-              <p className="mt-8 text-xl italic">{person.name}</p>
+          <div data-loader className={`pinstripe-deep pointer-events-none fixed inset-0 z-50 grid place-items-center will-change-transform motion-reduce:transition-none ${ready ? "-translate-y-full transition-transform duration-[750ms] ease-[cubic-bezier(0.76,0,0.24,1)]" : "translate-y-0"}`}>
+            <div className="flex flex-col items-center">
+              <img src={person.logo} alt="" className="h-[clamp(150px,27dvh,230px)] w-auto" fetchPriority="high" />
+              <div className="mt-2"><LoaderSignature /></div>
             </div>
           </div>
         )}
