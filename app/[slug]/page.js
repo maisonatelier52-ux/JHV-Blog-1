@@ -25,12 +25,12 @@ export default async function Page({ params }) {
   return (
     <Section>
       <h1 className={`max-w-2xl ${titleSize}`}>{page.title}</h1>
-      <div className={`mt-4 max-w-2xl space-y-3 font-body text-ink lg:mt-8 lg:space-y-5 ${bodySize}`}>
+      <div className={`mt-3 max-w-2xl space-y-2 font-body lg:mt-8 lg:space-y-5 ${bodySize}`}>
         {page.body.map((t) => <p key={t}>{t}</p>)}
       </div>
       {page.tags && (
-        <ul className="mt-5 flex flex-wrap gap-2">
-          {page.tags.map((t) => <li key={t} className="rounded-full border border-ink/20 bg-white px-4 py-2 text-sm font-medium lg:text-base">{t}</li>)}
+        <ul className="mt-3 flex flex-wrap gap-1.5 lg:mt-5 lg:gap-2">
+          {page.tags.map((t) => <li key={t} className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium text-white lg:border-ink/20 lg:bg-white lg:px-4 lg:py-2 lg:text-base lg:text-ink">{t}</li>)}
         </ul>
       )}
     </Section>

@@ -13,6 +13,13 @@
     radial-gradient(ellipse 60% 50% at 50% 45%, rgba(30, 56, 104, 0.45), transparent 75%);
 }
 
+/* Phone only: the navy loading-page background fades out towards the top, so the photo shows through above the text.
+   Make the fade reach higher by raising the height in components/Shell.js (h-[56dvh]) or the percentages below. */
+.fade-navy {
+  -webkit-mask-image: linear-gradient(to top, #000 0%, #000 42%, rgba(0,0,0,.85) 58%, rgba(0,0,0,.45) 80%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 0%, #000 42%, rgba(0,0,0,.85) 58%, rgba(0,0,0,.45) 80%, transparent 100%);
+}
+
 /* The loading page content is hidden by the critical styles in app/layout.js until this stylesheet is here */
 [data-loader] > * { visibility: visible !important; }
 
@@ -20,17 +27,13 @@
 @keyframes reveal { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes portrait-in { from { opacity: 0; transform: translateY(16px) scale(1.02); } to { opacity: 1; transform: none; } }
 @keyframes enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-@keyframes iris {
-  0% { clip-path: circle(0px at var(--x) var(--y)); }
-  45% { clip-path: circle(150vmax at var(--x) var(--y)); }
-  55% { clip-path: circle(150vmax at var(--x2) var(--y2)); }
-  100% { clip-path: circle(0px at var(--x2) var(--y2)); }
-}
+/* Page text: a plain, short fade when a page opens (see components/Reveal.js). Change 0.3s to make it faster or slower. */
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.fade-in { animation: fade-in 0.3s ease-out both; }
 .reveal { animation: reveal 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .portrait-in { animation: portrait-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .enter { animation: enter 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-.iris { animation: iris 1.3s cubic-bezier(0.7, 0, 0.3, 1) both; will-change: clip-path; }
-@media (prefers-reduced-motion: reduce) { .reveal, .enter, .portrait-in { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .reveal, .enter, .portrait-in, .fade-in { animation: none; } }
 /* While the navy curtain is down the page is already drawn behind it (so the photo is decoded and ready),
    but its entrance animations wait. They start the moment the curtain begins to lift. */
-[data-wait] .reveal, [data-wait] .enter, [data-wait] .portrait-in { animation-play-state: paused; }
+[data-wait] .reveal, [data-wait] .enter, [data-wait] .portrait-in, [data-wait] .fade-in { animation-play-state: paused; }
