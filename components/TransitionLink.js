@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useContext } from "react";
 import { TransitionContext } from "@/lib/transition";
 
-// A normal next/link that plays the iris transition before navigating.
+// A normal next/link that plays the blue fade transition before showing the next page.
 export default function TransitionLink({ href, onClick, ...props }) {
   const go = useContext(TransitionContext);
   const handle = (e) => {

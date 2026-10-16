@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Section from "@/components/Section";
+import Words from "@/components/Words";
 import { stops } from "@/lib/site";
 import { bodySize, titleSize } from "@/lib/styles";
 
@@ -24,7 +25,7 @@ export default async function Page({ params }) {
 
   return (
     <Section>
-      <h1 className={`max-w-2xl ${titleSize}`}>{page.title}</h1>
+      <h1 className={`max-w-2xl ${titleSize}`}><Words text={page.title} /></h1>
       <div className={`mt-3 max-w-2xl space-y-2 font-body lg:mt-8 lg:space-y-5 ${bodySize}`}>
         {page.body.map((t) => <p key={t}>{t}</p>)}
       </div>

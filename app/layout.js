@@ -36,7 +36,7 @@ export default function RootLayout({ children }) {
         <style dangerouslySetInnerHTML={{ __html: criticalCss }} />
       </head>
       <body className={`${display.variable} ${body.variable} ${script.variable} overflow-hidden bg-white font-display text-ink antialiased`}><noscript>
-          <style>{`[data-loader]{display:none!important}[data-wait] .reveal,[data-wait] .enter,[data-wait] .portrait-in,[data-wait] .fade-in{animation:none!important}`}</style>
+          <style>{`[data-loader]{display:none!important}[data-wait] .reveal,[data-wait] .enter,[data-wait] .portrait-in,[data-wait] .wi,[data-wait] .rise p,[data-wait] .rise ul,[data-wait] .label-in{animation:none!important}`}</style>
         </noscript>
         <Shell>{children}</Shell>
       </body>

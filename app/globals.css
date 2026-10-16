@@ -27,13 +27,29 @@
 @keyframes reveal { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
 @keyframes portrait-in { from { opacity: 0; transform: translateY(16px) scale(1.02); } to { opacity: 1; transform: none; } }
 @keyframes enter { from { opacity: 0; transform: translateY(18px); } to { opacity: 1; transform: none; } }
-/* Page text: a plain, short fade when a page opens (see components/Reveal.js). Change 0.3s to make it faster or slower. */
-@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
-.fade-in { animation: fade-in 0.3s ease-out both; }
+/* PAGE TRANSITION: a clean cross-dissolve (View Transitions API, started in components/Shell.js). Old and new page use the same
+   duration and easing, so the shared parts (portrait, header, buttons) never flicker or dip. Standard speed: 0.4s. */
+::view-transition-old(root), ::view-transition-new(root) { animation-duration: 0.4s; animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1); }
+
+/* WORD BY WORD HEADLINE (components/Words.js): each word rises from behind an invisible edge, 45ms after the one before.
+   Speed: change 0.75s (each word) or 45ms (gap between words). The first 14 words are staggered; the rest follow together. */
+@keyframes word-up { from { opacity: 0; transform: translate3d(0, 105%, 0); } to { opacity: 1; transform: none; } }
+.w { display: inline-block; overflow: hidden; vertical-align: top; padding: 0.1em 0.06em; margin: -0.1em -0.06em; } /* the padding keeps letter tails and italics from being cut */
+.wi { display: inline-block; will-change: transform; animation: word-up 0.75s cubic-bezier(0.16, 1, 0.3, 1) calc(0.12s + min(var(--i, 0), 14) * 45ms) both; }
+
+/* BODY TEXT: paragraphs and tags fade up softly, one after another, after the headline has started */
+@keyframes fade-up { from { opacity: 0; transform: translate3d(0, 12px, 0); } to { opacity: 1; transform: none; } }
+@keyframes label-in { from { opacity: 0; transform: translate3d(0, 6px, 0); } to { opacity: 1; transform: none; } }
+.rise > p, .rise > div > *, .rise > ul { animation: fade-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+.rise > p { animation-delay: 0.1s; }
+.rise > div > :nth-child(2) { animation-delay: 0.38s; }
+.rise > div > :nth-child(3) { animation-delay: 0.46s; }
+.rise > ul { animation-delay: 0.55s; }
+.label-in { animation: label-in 0.35s ease-out 0.1s both; }
 .reveal { animation: reveal 1.2s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .portrait-in { animation: portrait-in 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 .enter { animation: enter 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
-@media (prefers-reduced-motion: reduce) { .reveal, .enter, .portrait-in, .fade-in { animation: none; } }
-/* While the navy curtain is down the page is already drawn behind it (so the photo is decoded and ready),
-   but its entrance animations wait. They start the moment the curtain begins to lift. */
-[data-wait] .reveal, [data-wait] .enter, [data-wait] .portrait-in, [data-wait] .fade-in { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { .reveal, .enter, .portrait-in, .label-in, .wi, .rise > p, .rise > div > *, .rise > ul { animation: none; } }
+/* While the navy loading page is down the home page is already drawn behind it (so the photo is decoded and ready),
+   but its entrance animations wait. They start the moment the loading page begins to lift. */
+[data-wait] .reveal, [data-wait] .enter, [data-wait] .portrait-in, [data-wait] .label-in, [data-wait] .wi, [data-wait] .rise > p, [data-wait] .rise > div > *, [data-wait] .rise > ul { animation-play-state: paused; }

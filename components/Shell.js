@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { person, stops } from "@/lib/site";
 import { TransitionContext } from "@/lib/transition";
@@ -7,8 +7,8 @@ import TransitionLink from "./TransitionLink";
 import Arrow from "./Arrow";
 import LoaderSignature from "./LoaderSignature";
 
-const SHOW_MS = 1700; // how long the loading content stays on screen (the JHV mark finishes writing at ~1.3s, then it rests). Raise it to show longer.
-const LIFT_MS = 750; // the loading page lifts from the bottom to the top and shows the home page
+const SHOW_MS = 1400; // loading page: how long its content stays on screen (the JHV mark is written by ~1.1s, then it rests briefly). Standard: 1.2 - 1.6s.
+const LIFT_MS = 700; // loading page: it lifts from the bottom to the top and shows the home page
 
 // Header, portrait, controls, page transition and the loader. The page text itself lives in the routes.
 export default function Shell({ children }) {
@@ -27,10 +27,27 @@ export default function Shell({ children }) {
   const slide = stops[step];
   const nextStop = stops[step === last ? 0 : step + 1];
 
-  // Go to the next page straight away: no transition animation.
+  // Load every page in the background once, so a click never waits for the network (this removes the lag).
+  useEffect(() => { stops.forEach((s) => router.prefetch(s.href)); }, [router]);
+
+  // PAGE TRANSITION (clean cross-dissolve): the old page dissolves into the new one in 0.4s. There is no overlay, panel or shape,
+  // and no waiting: the page changes the moment you click. The new headline then writes in word by word (see components/Words.js).
+  // It uses the browser's View Transitions API; browsers without it (and reduced motion) switch pages instantly, the text effect still plays.
+  const arrived = useRef(null); // resolves when the new route is on screen
+  const busy = useRef(false);
+  useLayoutEffect(() => { arrived.current?.(); arrived.current = null; }, [pathname]);
+
   const go = useCallback((href) => {
-    if (href === pathname) return;
-    router.push(href);
+    if (href === pathname || busy.current) return;
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!document.startViewTransition || reduce) { router.push(href); return; }
+    busy.current = true;
+    const t = document.startViewTransition(() => new Promise((resolve) => {
+      arrived.current = resolve;
+      router.push(href);
+      setTimeout(resolve, 1500); // safety: never leave the page frozen
+    }));
+    t.finished.finally(() => { busy.current = false; });
   }, [pathname, router]);
 
   // Loading page: held until the JHV mark is written, then it lifts and the home page appears.
@@ -100,13 +117,13 @@ export default function Shell({ children }) {
           <div className="enter absolute inset-x-5 bottom-5 z-30 flex flex-col items-start gap-4 lg:inset-x-auto lg:bottom-10 lg:left-16">
             <div className="flex w-full items-center gap-3 lg:w-auto">
               {step > 0 && (
-                <TransitionLink href={stops[step - 1].href} aria-label="Previous" className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-line bg-white text-ink ring-4 ring-white/90 hover:bg-accent hover:text-white">
+                <TransitionLink href={stops[step - 1].href} aria-label="Previous" className="grid h-14 w-14 shrink-0 place-items-center rounded-full border border-line bg-white text-ink ring-4 ring-white/90 transition-colors duration-200 hover:bg-accent hover:text-white">
                   <span className="rotate-180"><Arrow /></span>
                 </TransitionLink>
               )}
               <TransitionLink id="next" href={nextStop.href} className="group flex min-w-0 flex-1 items-center justify-between gap-4 rounded-full bg-accent py-1.5 pl-[3.25rem] pr-1.5 text-lg lg:flex-none lg:justify-start lg:pl-6 font-medium text-white ring-4 ring-white/90">
-                <span className="flex-1 text-center lg:hidden">{slide.short}</span>
-                <span className="hidden lg:inline">{slide.next}</span>
+                <span key={`s${step}`} className="label-in flex-1 text-center lg:hidden">{slide.short}</span>
+                <span key={`n${step}`} className="label-in hidden lg:inline">{slide.next}</span>
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-accent"><Arrow /></span>
               </TransitionLink>
             </div>
@@ -121,7 +138,7 @@ export default function Shell({ children }) {
         {/* Loading page: home page only. Deep navy with white pinstripes, the crest and the JHV mark. When it is done it lifts
             from the bottom to the top and the home page is underneath. */}
         {loading && !gone && (
-          <div data-loader className={`pinstripe-deep pointer-events-none fixed inset-0 z-50 grid place-items-center will-change-transform motion-reduce:transition-none ${ready ? "-translate-y-full transition-transform duration-[750ms] ease-[cubic-bezier(0.76,0,0.24,1)]" : "translate-y-0"}`}>
+          <div data-loader className={`pinstripe-deep pointer-events-none fixed inset-0 z-50 grid place-items-center will-change-transform motion-reduce:transition-none ${ready ? "-translate-y-full transition-transform duration-[700ms] ease-[cubic-bezier(0.76,0,0.24,1)]" : "translate-y-0"}`}>
             <div className="flex flex-col items-center">
               <img src={person.logo} alt="" className="h-[clamp(150px,27dvh,230px)] w-auto" fetchPriority="high" />
               <div className="mt-2"><LoaderSignature /></div>

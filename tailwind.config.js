@@ -25,7 +25,7 @@ module.exports = {
         draw: { from: { transform: "scaleX(0)" }, to: { transform: "scaleX(1)" } },
       },
       animation: {
-        sign: "sign 1.2s cubic-bezier(0.4, 0.1, 0.3, 1) both",
+        sign: "sign 1s cubic-bezier(0.4, 0.1, 0.3, 1) both",
         draw: "draw 0.7s cubic-bezier(0.4, 0, 0.2, 1) both",
       },
     },
