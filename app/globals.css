@@ -13,7 +13,7 @@
     radial-gradient(ellipse 60% 50% at 50% 45%, rgba(30, 56, 104, 0.45), transparent 75%);
 }
 
-/* Phone only: the navy loading-page background fades out towards the top, so the photo shows through above the text.
+/* Phone only: a dark navy fade rises from the bottom, so the white text stays readable over the photo.
    Make the fade reach higher by raising the height in components/Shell.js (h-[56dvh]) or the percentages below. */
 .fade-navy {
   -webkit-mask-image: linear-gradient(to top, #000 0%, #000 42%, rgba(0,0,0,.85) 58%, rgba(0,0,0,.45) 80%, transparent 100%);
@@ -22,6 +22,18 @@
 
 /* The loading page content is hidden by the critical styles in app/layout.js until this stylesheet is here */
 [data-loader] > * { visibility: visible !important; }
+
+/* Fraunces at a sturdy optical size: warm, strong editorial letters (not the thin, sharp display cut) */
+.font-display { font-variation-settings: "opsz" 48; font-optical-sizing: none; }
+
+/* Loading page hint icon: appears after the JHV mark is written; the arrow bobs up, a soft ring pulses outward */
+.loader-hint { opacity: 0; animation: hint-in 900ms ease 1.6s forwards; }
+.hint-arrow { animation: hint-bob 1.8s ease-in-out 2.5s infinite; }
+.hint-ring { opacity: 0; animation: hint-ring 2.4s ease-out 2.5s infinite; }
+@keyframes hint-in { to { opacity: 1; } }
+@keyframes hint-bob { 0%, 100% { transform: translateY(2px); } 50% { transform: translateY(-3px); } }
+@keyframes hint-ring { 0% { opacity: 0.7; transform: scale(1); } 100% { opacity: 0; transform: scale(1.7); } }
+@media (prefers-reduced-motion: reduce) { .loader-hint { animation: hint-in 1ms linear forwards; } .hint-arrow, .hint-ring { animation: none; } }
 
 *:focus-visible { outline: 2px solid #12264A; outline-offset: 3px; }
 @keyframes reveal { from { clip-path: inset(100% 0 0 0); } to { clip-path: inset(0 0 0 0); } }
@@ -51,5 +63,6 @@
 .enter { animation: enter 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @media (prefers-reduced-motion: reduce) { .reveal, .enter, .portrait-in, .label-in, .wi, .rise > p, .rise > div > *, .rise > ul { animation: none; } }
 /* While the navy loading page is down the home page is already drawn behind it (so the photo is decoded and ready),
-   but its entrance animations wait. They start the moment the loading page begins to lift. */
-[data-wait] .reveal, [data-wait] .enter, [data-wait] .portrait-in, [data-wait] .label-in, [data-wait] .wi, [data-wait] .rise > p, [data-wait] .rise > div > *, [data-wait] .rise > ul { animation-play-state: paused; }
+   but its entrance animations wait. They start the moment the loading page begins to lift.
+   If something ever goes wrong, app/layout.js sets html[data-failsafe] after 10s and everything is released. */
+html:not([data-failsafe]) [data-wait] .reveal, html:not([data-failsafe]) [data-wait] .enter, html:not([data-failsafe]) [data-wait] .portrait-in, html:not([data-failsafe]) [data-wait] .label-in, html:not([data-failsafe]) [data-wait] .wi, html:not([data-failsafe]) [data-wait] .rise > p, html:not([data-failsafe]) [data-wait] .rise > div > *, html:not([data-failsafe]) [data-wait] .rise > ul { animation-play-state: paused; }

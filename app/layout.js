@@ -1,12 +1,24 @@
-// blog first for JHV
-import { Playfair_Display, Lora } from "next/font/google";
 import localFont from "next/font/local";
 import { person } from "@/lib/site";
 import Shell from "@/components/Shell";
 import "./globals.css";
 
-const display = Playfair_Display({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-display" });
-const body = Lora({ subsets: ["latin"], style: ["normal", "italic"], variable: "--font-body" });
+// Fonts are stored in the project (app/fonts), so the site never waits for, or fails on, a download from Google.
+// Blog / magazine style: Fraunces (an editorial serif, bold and sharp at large sizes) for the name, titles and tagline,
+// and Inter (a clean, very readable sans) for the text, buttons and tags.
+const display = localFont({
+  src: [
+    { path: "./fonts/fraunces-latin-opsz-normal.woff2", style: "normal", weight: "100 900" },
+    { path: "./fonts/fraunces-latin-opsz-italic.woff2", style: "italic", weight: "100 900" },
+  ],
+  variable: "--font-display",
+  display: "swap",
+});
+const body = localFont({
+  src: [{ path: "./fonts/inter-latin-wght-normal.woff2", style: "normal", weight: "100 900" }],
+  variable: "--font-body",
+  display: "swap",
+});
 // Handwriting face for the JHV mark on the loading page (My Soul, SIL Open Font License). It is typed text, not an image.
 const script = localFont({ src: "./fonts/my-soul.woff2", weight: "400", variable: "--font-signature", display: "block" });
 
@@ -17,16 +29,17 @@ export const metadata = {
 export const viewport = { width: "device-width", initialScale: 1 };
 
 // Critical styles, written straight into <head> so the loading page background is on screen on the home page
-// from the very first frame of a refresh, before the main stylesheet or any script has arrived. Without this the browser
-// shows plain white for a moment. Keep the colors in sync with `.pinstripe-deep` in app/globals.css.
+// from the very first frame of a refresh, before the main stylesheet or any script has arrived. Keep the colors in sync with `.pinstripe-deep` in app/globals.css.
 const stripes = (gap) => `repeating-linear-gradient(90deg,transparent 0,transparent ${gap - 1}px,rgba(255,255,255,.09) ${gap - 1}px,rgba(255,255,255,.09) ${gap}px),radial-gradient(ellipse 60% 50% at 50% 45%,rgba(30,56,104,.45),transparent 75%)`;
 const criticalCss = `html[data-home],[data-loader]{background-color:#050A14;background-image:${stripes(56)}}
 @media (max-width:640px){html[data-home],[data-loader]{background-image:${stripes(36)}}}
 [data-loader]{position:fixed;inset:0;z-index:50}
-[data-loader]>*{visibility:hidden}`;
-// Runs before the first paint. Only the home page shows the loading page, so only the home page gets the navy start
-// (other pages, and refreshes on them, are not touched). The browser bar on phones starts navy too, then Shell.js sets it back to light.
-const earlyScript = `if(location.pathname==="/"){document.documentElement.setAttribute("data-home","");var m=document.createElement("meta");m.name="theme-color";m.content="#050A14";document.head.appendChild(m)}`;
+[data-loader]>*{visibility:hidden}
+html[data-failsafe] [data-loader]{display:none!important}`;
+// Runs before the first paint. Only the home page shows the loading page, so only the home page gets the navy start.
+// FAILSAFE: the loading page waits for your click, so it can stay as long as you like. But if the site's scripts have not
+// started after 10 seconds (so a click could never work), the loading page is removed and the home page is released.
+const earlyScript = `if(location.pathname==="/"){var d=document.documentElement;d.setAttribute("data-home","");var m=document.createElement("meta");m.name="theme-color";m.content="#050A14";document.head.appendChild(m);setTimeout(function(){if(!d.hasAttribute("data-hydrated")){d.setAttribute("data-failsafe","");d.removeAttribute("data-home");m.content="#ECEEF1"}},10000)}`;
 
 export default function RootLayout({ children }) {
   return (
@@ -35,7 +48,8 @@ export default function RootLayout({ children }) {
         <script dangerouslySetInnerHTML={{ __html: earlyScript }} />
         <style dangerouslySetInnerHTML={{ __html: criticalCss }} />
       </head>
-      <body className={`${display.variable} ${body.variable} ${script.variable} overflow-hidden bg-white font-display text-ink antialiased`}><noscript>
+      <body className={`${display.variable} ${body.variable} ${script.variable} overflow-hidden bg-shade font-body text-ink antialiased`}>
+        <noscript>
           <style>{`[data-loader]{display:none!important}[data-wait] .reveal,[data-wait] .enter,[data-wait] .portrait-in,[data-wait] .wi,[data-wait] .rise p,[data-wait] .rise ul,[data-wait] .label-in{animation:none!important}`}</style>
         </noscript>
         <Shell>{children}</Shell>

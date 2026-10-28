@@ -12,8 +12,9 @@ module.exports = {
         greige: "#B9B2A5", // the JHV letters
       },
       fontFamily: {
-        display: ["var(--font-display)", "system-ui", "sans-serif"],
-        body: ["var(--font-body)", "Georgia", "serif"],
+        display: ["var(--font-display)", "Georgia", "serif"],
+        body: ["var(--font-body)", "system-ui", "sans-serif"],
+        sans: ["var(--font-body)", "system-ui", "sans-serif"],
         script: ["var(--font-signature)", "Snell Roundhand", "Apple Chancery", "cursive"],
       },
       keyframes: {
