@@ -18,4 +18,4 @@
 - `lib/seo.js` builds the page metadata (title, description, canonical, Open Graph, Twitter card) and the JSON-LD graph (Person, Britannia Financial Group, WebSite, ProfilePage or WebPage, BreadcrumbList). `components/JsonLd.js` prints it.
 - Every page uses the same social card: `public/images/og-card.jpg` (1200x630).
 - `app/sitemap.js` creates `/sitemap.xml` and `app/robots.js` creates `/robots.txt`.
-- After deploying: add the domain in Google Search Console, submit `https://juliovelutini.com/sitemap.xml`, and check the structured data with Google's Rich Results Test and the Schema Markup Validator.
+- After deploying: add the domain in Google Search Console, submit `http://www.juliovelutini.com/sitemap.xml` (the site URL is set once in `lib/site.js`; change it to https when SSL is on), and check the structured data with Google's Rich Results Test and the Schema Markup Validator.
