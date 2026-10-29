@@ -30,8 +30,8 @@ export default async function Page({ params }) {
         {page.body.map((t) => <p key={t}>{t}</p>)}
       </div>
       {page.tags && (
-        <ul className="mt-3 flex flex-wrap gap-1.5 lg:mt-5 lg:gap-2">
-          {page.tags.map((t) => <li key={t} className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-xs font-medium tracking-wide text-white lg:border-ink/20 lg:bg-white lg:px-4 lg:py-2 lg:text-base lg:text-ink">{t}</li>)}
+        <ul className="mt-3 hidden flex-wrap gap-1.5 lg:mt-5 lg:flex lg:gap-2">
+          {page.tags.map((t) => <li key={t} className="rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[0.7rem] font-medium uppercase tracking-[0.14em] text-white lg:border-ink/20 lg:bg-white lg:px-4 lg:py-2 lg:text-[0.78rem] lg:text-ink">{t}</li>)}
         </ul>
       )}
     </Section>

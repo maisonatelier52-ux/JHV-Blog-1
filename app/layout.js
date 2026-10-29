@@ -4,12 +4,12 @@ import Shell from "@/components/Shell";
 import "./globals.css";
 
 // Fonts are stored in the project (app/fonts), so the site never waits for, or fails on, a download from Google.
-// Blog / magazine style: Fraunces (an editorial serif, bold and sharp at large sizes) for the name, titles and tagline,
-// and Inter (a clean, very readable sans) for the text, buttons and tags.
+// Libre Baskerville (a classic book serif; regular weight, semibold for the header name) for the name, titles, tagline and paragraphs,
+// and Inter (a clean sans) for the small tracked-out capital labels: buttons and tags.
 const display = localFont({
   src: [
-    { path: "./fonts/fraunces-latin-opsz-normal.woff2", style: "normal", weight: "100 900" },
-    { path: "./fonts/fraunces-latin-opsz-italic.woff2", style: "italic", weight: "100 900" },
+    { path: "./fonts/libre-baskerville-latin-wght-normal.woff2", style: "normal", weight: "400 700" },
+    { path: "./fonts/libre-baskerville-latin-wght-italic.woff2", style: "italic", weight: "400 700" },
   ],
   variable: "--font-display",
   display: "swap",

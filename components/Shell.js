@@ -115,16 +115,16 @@ export default function Shell({ children }) {
             {/* <div className="absolute -right-[10%] top-[4%] aspect-square h-[80%] rounded-full bg-shade-deep" /> */}
             <img src={person.portrait} width={1104} height={1395} alt={`Portrait of ${person.name}`} fetchPriority="high" decoding="async" className="absolute inset-0 h-full w-full object-cover object-[right_top] lg:object-contain lg:object-right-bottom" />
           </div>
-          {/* Phone only: the photo fades into dark navy so the white text can sit over it */}
-          <div className="fade-navy bg-navy-950 pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[56dvh] lg:hidden" />
-
           {/* Header: on phones only the crest in a round badge (so the face stays clear); on desktop the capsule with crest and name */}
-          <div className="enter fixed left-4 top-4 z-40 sm:left-6 sm:top-5 lg:left-[clamp(4rem,7.5vw,9rem)] lg:top-7">
+          <div className="enter fixed left-4 top-4 z-40 flex items-center gap-2 sm:left-6 sm:top-5 lg:left-[clamp(4rem,7.5vw,9rem)] lg:top-7 lg:items-stretch lg:gap-3">
             <TransitionLink href="/" aria-label="Home" className="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-white shadow-sm lg:h-auto lg:w-auto lg:justify-start lg:gap-3 lg:py-2 lg:pl-3 lg:pr-6">
               <img src={person.logo} alt="" className="h-12 w-auto lg:h-11" />
-              <span className="hidden font-display text-lg font-bold tracking-[-0.02em] lg:inline lg:text-xl">{person.name}</span>
+              <span className="hidden font-display text-[0.95rem] font-semibold uppercase tracking-[0.05em] lg:inline lg:text-[1.05rem]">{person.name}</span>
             </TransitionLink>
           </div>
+
+          {/* Phone only: the photo fades into dark navy so the white text can sit over it */}
+          <div className="fade-navy bg-navy-950 pointer-events-none absolute inset-x-0 bottom-0 z-[15] h-[56dvh] lg:hidden" />
 
           {/* The page's own text */}
           <main>{children}</main>
@@ -137,7 +137,7 @@ export default function Shell({ children }) {
                   <span className="rotate-180"><Arrow /></span>
                 </TransitionLink>
               )}
-              <TransitionLink id="next" href={nextStop.href} className="group flex min-w-0 flex-1 items-center justify-between gap-4 rounded-full bg-accent py-1.5 pl-[3.25rem] pr-1.5 text-lg tracking-[0.01em] lg:flex-none lg:justify-start lg:pl-6 font-medium text-white ring-4 ring-white/90">
+              <TransitionLink id="next" href={nextStop.href} className="group flex min-w-0 flex-1 items-center justify-between gap-4 rounded-full bg-accent py-1.5 pl-[3.25rem] pr-1.5 text-[0.8rem] font-medium uppercase tracking-[0.14em] lg:flex-none lg:justify-start lg:pl-6 text-white ring-4 ring-white/90">
                 <span key={`s${step}`} className="label-in flex-1 text-center lg:hidden">{slide.short}</span>
                 <span key={`n${step}`} className="label-in hidden lg:inline">{slide.next}</span>
                 <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-accent"><Arrow /></span>

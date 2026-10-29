@@ -23,9 +23,6 @@
 /* The loading page content is hidden by the critical styles in app/layout.js until this stylesheet is here */
 [data-loader] > * { visibility: visible !important; }
 
-/* Fraunces at a sturdy optical size: warm, strong editorial letters (not the thin, sharp display cut) */
-.font-display { font-variation-settings: "opsz" 48; font-optical-sizing: none; }
-
 /* Loading page hint icon: appears after the JHV mark is written; the arrow bobs up, a soft ring pulses outward */
 .loader-hint { opacity: 0; animation: hint-in 900ms ease 1.6s forwards; }
 .hint-arrow { animation: hint-bob 1.8s ease-in-out 2.5s infinite; }
@@ -66,3 +63,15 @@
    but its entrance animations wait. They start the moment the loading page begins to lift.
    If something ever goes wrong, app/layout.js sets html[data-failsafe] after 10s and everything is released. */
 html:not([data-failsafe]) [data-wait] .reveal, html:not([data-failsafe]) [data-wait] .enter, html:not([data-failsafe]) [data-wait] .portrait-in, html:not([data-failsafe]) [data-wait] .label-in, html:not([data-failsafe]) [data-wait] .wi, html:not([data-failsafe]) [data-wait] .rise > p, html:not([data-failsafe]) [data-wait] .rise > div > *, html:not([data-failsafe]) [data-wait] .rise > ul { animation-play-state: paused; }
+
+/* Short phones (about 640px tall or less): slightly smaller text so it stays below the face and hands. */
+@media (max-width: 1023px) and (max-height: 700px) {
+  .t-title { font-size: 1.3rem; }
+  .t-body { font-size: 0.82rem; line-height: 1.5; }
+}
+
+/* Phones: slightly smaller, tighter text so the block sits low, over the dark fade, clear of the face and hands. */
+@media (max-width: 1023px) {
+  .t-title { font-size: clamp(1.3rem, 5.6vw, 1.5rem); line-height: 1.12; }
+  .t-body { font-size: clamp(0.8rem, 3.4vw, 0.9rem); line-height: 1.5; }
+}
