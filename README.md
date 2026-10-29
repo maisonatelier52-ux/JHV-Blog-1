@@ -11,3 +11,11 @@
 - Colors: `tailwind.config.js` (`accent` is the dark blue used on buttons and dots). The loading page is the only dark navy pinstripe screen (`.pinstripe-deep` in `app/globals.css`, `--stripe` / `--stripe-color`). Fonts (stored in `app/fonts`, set in `app/layout.js`, no Google download needed): Libre Baskerville (regular weight) for the name, titles, tagline and paragraphs, Inter for the small capital labels (header name, buttons, tags); all sizes are in `lib/styles.js`. The left edge of the header, text and bottom buttons is one value, `clamp(4rem,7.5vw,9rem)`, used in `components/Shell.js` and `components/Section.js`. The JHV loading mark uses My Soul from `app/fonts/my-soul.woff2` (`components/LoaderSignature.js`).
 - Navigate with the buttons, dots, the crest, arrow keys or swipe.
 
+
+## SEO
+
+- Domain, OG image, keywords, `sameAs` profile links and verification codes: `site` in `lib/site.js`. Titles and descriptions for each page: `seoTitle` and `description` on each item in `slides`.
+- `lib/seo.js` builds the page metadata (title, description, canonical, Open Graph, Twitter card) and the JSON-LD graph (Person, Britannia Financial Group, WebSite, ProfilePage or WebPage, BreadcrumbList). `components/JsonLd.js` prints it.
+- Every page uses the same social card: `public/images/og-card.jpg` (1200x630).
+- `app/sitemap.js` creates `/sitemap.xml` and `app/robots.js` creates `/robots.txt`.
+- After deploying: add the domain in Google Search Console, submit `https://juliovelutini.com/sitemap.xml`, and check the structured data with Google's Rich Results Test and the Schema Markup Validator.

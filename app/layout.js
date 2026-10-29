@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
-import { person } from "@/lib/site";
+import { person, site } from "@/lib/site";
+import { stops } from "@/lib/site";
 import Shell from "@/components/Shell";
 import "./globals.css";
 
@@ -22,9 +23,23 @@ const body = localFont({
 // Handwriting face for the JHV mark on the loading page (My Soul, SIL Open Font License). It is typed text, not an image.
 const script = localFont({ src: "./fonts/my-soul.woff2", weight: "400", variable: "--font-signature", display: "block" });
 
+const home = stops[0];
 export const metadata = {
-  title: { default: person.name, template: `%s — ${person.name}` },
-  description: person.tagline,
+  metadataBase: new URL(site.url),
+  title: { default: home.seoTitle, template: `%s — ${person.name}` },
+  description: home.description,
+  applicationName: site.name,
+  keywords: site.keywords,
+  category: "finance",
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 } },
+  openGraph: {
+    type: "website", locale: site.locale, siteName: site.name, url: "/",
+    title: home.seoTitle, description: home.description,
+    images: [{ url: site.ogImage, width: 1200, height: 630, alt: site.ogImageAlt, type: "image/jpeg" }],
+  },
+  twitter: { card: "summary_large_image", title: home.seoTitle, description: home.description, images: [{ url: site.ogImage, alt: site.ogImageAlt }] },
+  verification: { google: site.verification.google || undefined, other: site.verification.bing ? { "msvalidate.01": site.verification.bing } : undefined },
 };
 export const viewport = { width: "device-width", initialScale: 1 };
 
@@ -43,7 +58,7 @@ const earlyScript = `if(location.pathname==="/"){var d=document.documentElement;
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-US" suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: earlyScript }} />
         <style dangerouslySetInnerHTML={{ __html: criticalCss }} />

@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import Section from "@/components/Section";
 import Words from "@/components/Words";
+import JsonLd from "@/components/JsonLd";
+import { pageJsonLd, pageMetadata } from "@/lib/seo";
 import { stops } from "@/lib/site";
 import { bodySize, titleSize } from "@/lib/styles";
 
@@ -15,7 +17,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const page = pages.find((s) => s.slug === slug);
-  return { title: page?.nav };
+  return page ? pageMetadata(page) : {};
 }
 
 export default async function Page({ params }) {
@@ -25,6 +27,7 @@ export default async function Page({ params }) {
 
   return (
     <Section>
+      <JsonLd data={pageJsonLd(page)} />
       <h1 className={`max-w-2xl ${titleSize}`}><Words text={page.title} /></h1>
       <div className={`mt-3 max-w-2xl space-y-2 lg:mt-8 lg:space-y-5 ${bodySize}`}>
         {page.body.map((t) => <p key={t}>{t}</p>)}
