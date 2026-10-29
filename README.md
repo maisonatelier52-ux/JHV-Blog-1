@@ -4,7 +4,7 @@
     npm run dev      # http://localhost:3000
     npm run build && npm start
 
-- Every screen is its own page: `/`, `/who-is-julio`, `/family-legacy`, `/global-career`, `/focus`. The text is rendered by the pages (`app/page.js`, `app/[slug]/page.js`), not by React state.
+- Every screen is its own page: `/`, `/international-banker`, `/family-tradition-in-banking`, `/caracas-to-london`, `/client-first-finance`. The text is rendered by the pages (`app/page.js`, `app/[slug]/page.js`), not by React state.
 - Text and pages: `lib/site.js` (add or remove items in `slides`; each one needs a `slug`).
 - `components/Shell.js`: header, portrait, buttons, dots, iris transition, keyboard and swipe navigation, and the loader. The crest + JHV loading page is an intro page of its own, shown only when the home page is opened. It stays until you click or tap anywhere on it (or press a key), then it lifts and shows the home page; it never opens by itself. A small arrow icon in a ring (no text) at the bottom shows that it can be opened. A failsafe in `app/layout.js` removes it only if the site's scripts fail to start within 10 seconds. Other pages, and refreshes on them, start straight away.
 - Images: `public/images/portrait.webp` (transparent cutout) and `public/images/logo.png`. The browser tab icon is `app/icon.png`.
